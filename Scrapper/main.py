@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 
 base_url = "https://weworkremotely.com/remote-jobs/search?&term="
-search_term = "python"
+search_term = "php"
 
 
 
@@ -11,13 +11,38 @@ response = requests.get(f"{base_url}{search_term}")
 if response.status_code != 200:
     print("Can't request website")
 else:
+    results = []
     soup = BeautifulSoup(response.text, "html.parser")
     jobs = soup.findAll("section",class_="jobs")
     for job_section in jobs:
         job_post = job_section.find_all('li', class_="feature")
         for post in job_post:
-            print(post)
-            print("//////////////")
+            anchors = post.find_all('a')
+            anchor = anchors[1]
+            link = anchor['href']
+            company, kind, region = anchor.find_all('span',class_="company")
+            title = anchor.find('span',class_="title")
+            job_data = {
+                'company' : company.string,
+                'kind':kind.string,
+                'region': region.string,
+                'title':title.string
+            }
+            results.append(job_data)
+        for result in results:
+            print(result)
+            print("////////////////////////")
+
+# list_of_number = [1,2,3]
+
+# first = list_of_number[0]
+# second = list_of_number[1]
+# third = list_of_number[2]
+
+# # same as
+# first , second, third = list_of_number
+
+# print(first, second, third)
 
 # def say_hello(name, age):
 #     print(f"Hello {name} you are {age} years old")
