@@ -1,54 +1,25 @@
-from bs4 import BeautifulSoup
-import requests
+from requests import get
+from extractors.wwr import extract_wwr_jobs
 
-base_url = "https://weworkremotely.com/remote-jobs/search?&term="
-search_term = "php"
+base_url = "https://kr.indeed.com/jobs?q="
+search_term = "python"
 
 
+headers= {
+    "Accept": "*/*", 
+    "Accept-Encoding": "gzip, deflate", 
+    "Host": "httpbin.org", 
+    "User-Agent": "python-requests/2.26.0", 
+}
 
-response = requests.get(f"{base_url}{search_term}")
 
-if response.status_code != 200:
-    print("Can't request website")
+response = get(f"{base_url}{search_term}",headers=headers )
+
+
+if(response.status_code == 200):
+    print(response.text)
 else:
-    results = []
-    soup = BeautifulSoup(response.text, "html.parser")
-    jobs = soup.findAll("section",class_="jobs")
-    for job_section in jobs:
-        job_post = job_section.find_all('li', class_="feature")
-        for post in job_post:
-            anchors = post.find_all('a')
-            anchor = anchors[1]
-            link = anchor['href']
-            company, kind, region = anchor.find_all('span',class_="company")
-            title = anchor.find('span',class_="title")
-            job_data = {
-                'company' : company.string,
-                'kind':kind.string,
-                'region': region.string,
-                'title':title.string
-            }
-            results.append(job_data)
-        for result in results:
-            print(result)
-            print("////////////////////////")
-
-# list_of_number = [1,2,3]
-
-# first = list_of_number[0]
-# second = list_of_number[1]
-# third = list_of_number[2]
-
-# # same as
-# first , second, third = list_of_number
-
-# print(first, second, third)
-
-# def say_hello(name, age):
-#     print(f"Hello {name} you are {age} years old")
-
-
-# say_hello("gon", 12)
-# say_hello(age=12, name="gon")
-
+    print(response.status_code)
+    print(response.headers)
+    
 
